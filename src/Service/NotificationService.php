@@ -131,6 +131,7 @@ class NotificationService
      * @param string      $identifier The Identifier of the notification event
      * @param DataObject  $context    The context (if relevant) of the object to notify on
      * @param array       $data       Extra data to be sent along with the notification
+     * @param string $channel a channel to use for this notification, overrides SystemNotification.Channels value
      */
     public function notify(string $identifier, DataObject $context, array $data = [], ?string $channel = null)
     {
@@ -146,8 +147,12 @@ class NotificationService
 
                 // figure out the channels to send the notification on
                 $channels = $channel ? [$channel] : [];
-                if ($notification->Channels) {
-                    $channels = json_decode($notification->Channels);
+                if ($channels === [] && is_string($notification->Channels)) {
+                    try {
+                        $channels = json_decode($notification->Channels);
+                    } catch (\JsonException) {
+                        // noop
+                    }
                 }
 
                 $this->sendNotification($notification, $context, $data, $channels);
