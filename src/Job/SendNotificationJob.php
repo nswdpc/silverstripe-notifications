@@ -37,7 +37,6 @@ if (class_exists(AbstractQueuedJob::class)) {
          * SendNotificationJob constructor.
          * @param \Symbiote\Notifications\Model\SystemNotification|null $notification
          * @param \SilverStripe\ORM\DataObject|null                     $context
-         * @param array                                                 $data
          */
         public function __construct(
             SystemNotification $notification = null,
@@ -115,7 +114,7 @@ if (class_exists(AbstractQueuedJob::class)) {
             $remaining = $this->sendTo;
 
             // if there's no more, we're done!
-            if (count($remaining) === 0) {
+            if ($remaining === []) {
                 /* @phpstan-ignore property.notFound */
                 $this->isComplete = true;
                 return;

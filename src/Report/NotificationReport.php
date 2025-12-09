@@ -19,6 +19,7 @@ class NotificationReport extends Report
         InternalNotification::class => 'Internal message',
     ];
 
+    #[\Override]
     public function title()
     {
         return _t(self::class . '.NOTIFICATION_REPORT', 'Notifications');
@@ -29,7 +30,7 @@ class NotificationReport extends Report
         return _t(self::class . '.NOTIFICATION_REPORT_TITLE', "Notification reports");
     }
 
-    public function sourceRecords($params, $sort, $limit)
+    public function sourceRecords(array $params, $sort, $limit)
     {
         $type = $this->getReportType($params);
 
@@ -43,6 +44,7 @@ class NotificationReport extends Report
         ]);
     }
 
+    #[\Override]
     public function columns()
     {
         $ctrl = Controller::curr();
@@ -52,7 +54,7 @@ class NotificationReport extends Report
         return $type::config()->summary_fields;
     }
 
-    protected function getReportType($params)
+    protected function getReportType(array $params)
     {
         $type = $params['Type'] ?? InternalNotification::class;
         $types = self::config()->get('notification_types');

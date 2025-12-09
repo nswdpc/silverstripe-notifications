@@ -9,6 +9,22 @@ use Symbiote\MultiValueField\ORM\FieldType\MultiValueField;
 use Symbiote\MultiValueField\Fields\KeyValueField;
 use SilverStripe\Security\Permission;
 
+/**
+ * @property string $Title
+ * @property ?string $Message
+ * @property ?string $SentOn
+ * @property bool $IsRead
+ * @property bool $IsSeen
+ * @property mixed $Context
+ * @property int $ToID
+ * @property int $FromID
+ * @property int $SourceObjectID
+ * @property int $SourceNotificationID
+ * @method \SilverStripe\Security\Member To()
+ * @method \SilverStripe\Security\Member From()
+ * @method \SilverStripe\ORM\DataObject SourceObject()
+ * @method \Symbiote\Notifications\Model\SystemNotification SourceNotification()
+ */
 class InternalNotification extends DataObject
 {
     private static string $table_name = 'InternalNotification';
@@ -39,6 +55,7 @@ class InternalNotification extends DataObject
 
     private static string $default_sort = 'ID DESC';
 
+    #[\Override]
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -48,6 +65,7 @@ class InternalNotification extends DataObject
         }
     }
 
+    #[\Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -56,6 +74,7 @@ class InternalNotification extends DataObject
         return $fields;
     }
 
+    #[\Override]
     public function canView($member = null)
     {
         $member = $member ?: Security::getCurrentUser();
@@ -70,6 +89,7 @@ class InternalNotification extends DataObject
         return (!$this->ID || $this->ToID == $member->ID || $this->FromID == $member->ID);
     }
 
+    #[\Override]
     public function canEdit($member = null)
     {
         $member = $member ?: Security::getCurrentUser();

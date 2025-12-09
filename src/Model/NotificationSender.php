@@ -22,11 +22,6 @@ interface NotificationSender
 
     /**
      * Send a notification to a single user at a time
-     *
-     * @param SystemNotification            $notification
-     * @param \SilverStripe\ORM\DataObject  $context
-     * @param object $user
-     * @param array                         $data
      */
     public function sendToUser(SystemNotification $notification, DataObject $context, object $user, array $data);
 }

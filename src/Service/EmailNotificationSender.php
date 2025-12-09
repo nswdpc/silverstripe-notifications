@@ -58,21 +58,12 @@ class EmailNotificationSender implements NotificationSender
     {
         $subject = $notification->format($notification->Title, $context, $user, $data);
 
-        if (Config::inst()->get(SystemNotification::class, 'html_notifications')) {
-            $message = $notification->format(
-                $notification->NotificationContent(),
-                $context,
-                $user,
-                $data
-            );
-        } else {
-            $message = $notification->format(
-                $notification->NotificationContent(),
-                $context,
-                $user,
-                $data
-            );
-        }
+        $message = $notification->format(
+            $notification->NotificationContent(),
+            $context,
+            $user,
+            $data
+        );
 
         if (($template = $notification->getTemplate()) !== '') {
             $templateData = $notification->getTemplateData($context, $user, $data);

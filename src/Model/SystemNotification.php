@@ -29,13 +29,14 @@ use SilverStripe\Forms\ListboxField;
  * SystemNotification
  * @author  marcus@symbiote.com.au, shea@livesource.co.nz
  * @license http://silverstripe.org/bsd-license/
- * @property string $Identifier
+ * @property ?string $Identifier
  * @property string $Title
- * @property string $Description
- * @property string $NotificationText
- * @property string $NotificationHTML
- * @property string $NotifyOnClass
- * @property string $CustomTemplate
+ * @property ?string $Description
+ * @property ?string $NotificationText
+ * @property ?string $NotificationHTML
+ * @property ?string $NotifyOnClass
+ * @property ?string $CustomTemplate
+ * @property ?string $Channels
  */
 class SystemNotification extends DataObject implements PermissionProvider
 {
@@ -71,7 +72,6 @@ class SystemNotification extends DataObject implements PermissionProvider
     /**
      * Name of a template file to render all notifications with
      * Note: it's up to the NotificationSender to decide whether or not to use it
-     * @var string
      */
     private static string $default_template = '';
 
@@ -93,16 +93,16 @@ class SystemNotification extends DataObject implements PermissionProvider
         'ChannelsSummary' => 'Channels'
     ];
 
-    public function getChannelsSummary() {
+    public function getChannelsSummary(): string {
         try {
             $values = json_decode($this->Channels);
             if(is_array($values)) {
-                $values = array_map('ucfirst', $values);
+                $values = array_map(ucfirst(...), $values);
                 return htmlspecialchars(implode(",", $values));
             } else {
                 return '';
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return '';
         }
     }
@@ -110,6 +110,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     /**
      * @return FieldList
      */
+    #[\Override]
     public function getCMSFields()
     {
         // Get NotifiedOn implementors
@@ -185,7 +186,7 @@ class SystemNotification extends DataObject implements PermissionProvider
 
         $channels = Injector::inst()->get(NotificationService::class)->getChannels();
         if ($channels && count($channels)) {
-            $sendChannels = array_combine($channels, array_map('ucfirst', $channels));
+            $sendChannels = array_combine($channels, array_map(ucfirst(...), $channels));
             $list = ListboxField::create('Channels', 'Send via channels', $sendChannels);
             $fields->insertBefore('AvailableKeywords', $list);
             $list->setRightTitle('Leave empty to send to all channels');
@@ -277,10 +278,9 @@ class SystemNotification extends DataObject implements PermissionProvider
 
         // render
         /* @phpstan-ignore silverstan.injectable.useCreate */
-        $viewer = new SSViewer_FromString($text);
-        $string = $viewer->process($data);
+        $viewer = \SilverStripe\View\SSViewer_FromString::create($text);
 
-        return $string;
+        return $viewer->process($data);
     }
 
     /**
@@ -324,6 +324,7 @@ class SystemNotification extends DataObject implements PermissionProvider
         if($template === '') {
             $template = self::config()->get('default_template') ?? '';
         }
+
         return $template;
     }
 
@@ -335,21 +336,25 @@ class SystemNotification extends DataObject implements PermissionProvider
         return self::config()->get('html_notifications') ? $this->NotificationHTML : $this->NotificationText;
     }
 
+    #[\Override]
     public function canView($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_VIEW');
     }
 
+    #[\Override]
     public function canEdit($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_EDIT');
     }
 
+    #[\Override]
     public function canDelete($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_DELETE');
     }
 
+    #[\Override]
     public function canCreate($member = null, $context = [])
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_CREATE');

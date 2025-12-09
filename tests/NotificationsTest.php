@@ -120,7 +120,6 @@ class NotificationsTest extends SapphireTest
         $expectedTo = $users[0]->Email;
         $expectedFrom = 'test@test.com';
         $expectedSubject = $notification->Title;
-        $expectedBody = "This is a notfication to {$expectedTo} about $page->Title";
 
         $this->assertEmailSent($expectedTo, $expectedFrom, $expectedSubject);
     }

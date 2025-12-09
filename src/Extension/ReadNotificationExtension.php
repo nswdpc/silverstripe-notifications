@@ -9,6 +9,7 @@ use Symbiote\Notifications\Model\InternalNotification;
 
 /**
  * This extension is not applied by default
+ * @extends \SilverStripe\Core\Extension<static>
  */
 class ReadNotificationExtension extends Extension
 {

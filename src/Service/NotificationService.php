@@ -56,7 +56,7 @@ class NotificationService
     public function __construct()
     {
         if (!class_exists(QueuedJobService::class)) {
-            $this->config()->use_queues = false;
+            $this->config()->set('use_queues', false);
         }
 
         $this->setSenders($this->config()->get('default_senders'));
@@ -202,7 +202,6 @@ class NotificationService
 
     /**
      * Sends a notification directly to a user
-     * @param object $user
      */
     public function sendToUser(
         SystemNotification $notification,
