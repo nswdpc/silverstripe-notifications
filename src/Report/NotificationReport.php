@@ -55,7 +55,8 @@ class NotificationReport extends Report
     protected function getReportType($params)
     {
         $type = $params['Type'] ?? InternalNotification::class;
-        if (!isset(self::config()->notification_types[$type])) {
+        $types = self::config()->get('notification_types');
+        if (!isset($types[$type])) {
             throw new Exception("Invalid type");
         }
 
@@ -67,8 +68,9 @@ class NotificationReport extends Report
         $ctrl = Controller::curr();
         $params = $ctrl ? $ctrl->getRequest()->getVar('filter') : [];
 
+        $types = self::config()->get('notification_types') ?? [];
         $fields = FieldList::create(
-            DropdownField::create('Type', 'Notification type', self::config()->notification_types),
+            DropdownField::create('Type', 'Notification type', $types),
             $from = DateField::create('From'),
             $to = DateField::create('To')
         );

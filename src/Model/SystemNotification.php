@@ -29,13 +29,13 @@ use SilverStripe\Forms\ListboxField;
  * SystemNotification
  * @author  marcus@symbiote.com.au, shea@livesource.co.nz
  * @license http://silverstripe.org/bsd-license/
- * @property string Identifier
- * @property string Title
- * @property string Description
- * @property string NotificationText
- * @property string NotificationHTML
- * @property string NotifyOnClass
- * @property string CustomTemplate
+ * @property string $Identifier
+ * @property string $Title
+ * @property string $Description
+ * @property string $NotificationText
+ * @property string $NotificationHTML
+ * @property string $NotifyOnClass
+ * @property string $CustomTemplate
  */
 class SystemNotification extends DataObject implements PermissionProvider
 {
@@ -114,7 +114,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     {
         // Get NotifiedOn implementors
         $types = ClassInfo::implementorsOf(NotifiedOn::class);
-        $configTypes = self::config()->notify_on;
+        $configTypes = self::config()->get('notify_on');
 
         $types = array_merge($types, $configTypes);
 
@@ -139,7 +139,7 @@ class SystemNotification extends DataObject implements PermissionProvider
         }
 
         // Identifiers
-        $identifiers = $this->config()->get('identifiers');
+        $identifiers = self::config()->get('identifiers');
         if (count($identifiers) !== 0) {
             $identifiers = array_combine($identifiers, $identifiers);
         }
@@ -176,7 +176,7 @@ class SystemNotification extends DataObject implements PermissionProvider
                         )
                     )->setAttribute(
                         'placeholder',
-                        $this->config()->get('default_template')
+                        self::config()->get('default_template')
                     ),
                     LiteralField::create('AvailableKeywords', $availableKeywords)
                 )
@@ -191,7 +191,7 @@ class SystemNotification extends DataObject implements PermissionProvider
             $list->setRightTitle('Leave empty to send to all channels');
         }
 
-        if ($this->config()->html_notifications) {
+        if (self::config()->get('html_notifications')) {
             $fields->insertBefore(
                 'AvailableKeywords',
                 HTMLEditorField::create(
@@ -221,7 +221,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     {
         $keywords = [];
 
-        foreach ($this->config()->get('global_keywords') as $k => $v) {
+        foreach (self::config()->get('global_keywords') as $k => $v) {
             $keywords[] = '<strong>'.$k.'</strong> ' . $v;
         }
 
@@ -276,6 +276,7 @@ class SystemNotification extends DataObject implements PermissionProvider
         $data = $this->getTemplateData($context, $user, $extraData);
 
         // render
+        /* @phpstan-ignore silverstan.injectable.useCreate */
         $viewer = new SSViewer_FromString($text);
         $string = $viewer->process($data);
 
@@ -321,7 +322,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     {
         $template = $this->CustomTemplate ?? '';
         if($template === '') {
-            $template = $this->config()->get('default_template') ?? '';
+            $template = self::config()->get('default_template') ?? '';
         }
         return $template;
     }
@@ -331,7 +332,7 @@ class SystemNotification extends DataObject implements PermissionProvider
      */
     public function NotificationContent(): string
     {
-        return $this->config()->html_notifications ? $this->NotificationHTML : $this->NotificationText;
+        return self::config()->get('html_notifications') ? $this->NotificationHTML : $this->NotificationText;
     }
 
     public function canView($member = null)

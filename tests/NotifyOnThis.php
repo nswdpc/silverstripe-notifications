@@ -17,6 +17,8 @@ class NotifyOnThis extends DataObject implements NotifiedOn, TestOnly
 {
     use Configurable;
 
+    private static string $table_name = "NotificationsTestNotifyOnThis";
+
     private static array $db = [
         'Title' => 'Varchar',
         'NotifyBy' => 'Datetime',

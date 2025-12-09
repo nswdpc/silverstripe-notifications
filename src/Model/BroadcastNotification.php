@@ -100,7 +100,7 @@ class BroadcastNotification extends DataObject implements NotifiedOn
             return Member::get()->filter('Groups.ID', $groupIds)->toArray();
         }
 
-        return null;
+        return [];
     }
 
     public function Link(): ?string

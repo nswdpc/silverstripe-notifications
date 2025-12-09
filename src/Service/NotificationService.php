@@ -67,7 +67,7 @@ class NotificationService
      * Add a channel that this notification service should use when sending notifications
      * @param string $channel The channel to add
      */
-    public function addChannel($channel): self
+    public function addChannel(string $channel): self
     {
         $this->channels[] = $channel;
 
@@ -83,7 +83,7 @@ class NotificationService
      * Set the list of channels this notification service should use when sending notifications
      * @param array $channels The channels to send to
      */
-    public function setChannels($channels): static
+    public function setChannels(array $channels): static
     {
         $this->channels = $channels;
 
@@ -186,11 +186,7 @@ class NotificationService
                 )
             );
         } else {
-            if (!is_array($channels)) {
-                $channels = [$channels];
-            }
-
-            $channels = count($channels) ? $channels : $this->channels;
+            $channels = $channels !== [] ? $channels : $this->getChannels();
             foreach ($channels as $channel) {
                 if ($sender = $this->getSender($channel)) {
                     $sender->sendNotification($notification, $context, $extraData);

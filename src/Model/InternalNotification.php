@@ -67,7 +67,7 @@ class InternalNotification extends DataObject
             return true;
         }
 
-        return $member && (!$this->ID || $this->ToID == $member->ID || $this->FromID == $member->ID);
+        return (!$this->ID || $this->ToID == $member->ID || $this->FromID == $member->ID);
     }
 
     public function canEdit($member = null)
@@ -81,6 +81,6 @@ class InternalNotification extends DataObject
             return true;
         }
 
-        return $member && (!$this->ID || $this->ToID == $member->ID);
+        return (!$this->ID || $this->ToID == $member->ID);
     }
 }
