@@ -2,16 +2,14 @@
 
 Send CMS managed system email notifications from code.
 
-## Maintainer Contacts
-*  Marcus Nyeholt (<marcus@symbiote.com.au>)
-*  Shea Dawson (<shea@symbiote.com.au>)
-
 ## Requirements
-* SilverStripe 4.0 +
+* SilverStripe 5.0 +
 
 ## Installation Instructions
 
-```
+> Add this repo's URL first as a repository entry in composer.json
+
+```sh
 composer require symbiote/silverstripe-notifications
 ```
 
