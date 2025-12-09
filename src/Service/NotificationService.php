@@ -149,7 +149,7 @@ class NotificationService
                 $channels = $channel ? [$channel] : [];
                 if ($channels === [] && is_string($notification->Channels)) {
                     try {
-                        $channels = json_decode($notification->Channels);
+                        $channels = json_decode($notification->Channels, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException) {
                         // noop
                     }
