@@ -27,8 +27,9 @@ class MemberExtension extends Extension
 
         foreach (InternalNotification::get()->filter($filter)->limit($limit, $offset) as $intNote) {
             $notification = ArrayData::create($intNote->toMap());
+            $from = $intNote->From();
             /** @phpstan-ignore method.notFound */
-            $notification->setField('FromUsername', $intNote->From()->getNotificationUsername());
+            $notification->setField('FromUsername', ($from ? $from->getNotificationUsername() : null));
             $notifications->push($notification);
         }
 
