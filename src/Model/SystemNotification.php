@@ -95,7 +95,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     public function getChannelsSummary(): string
     {
         try {
-            $values = json_decode($this->Channels);
+            $values = json_decode((string) $this->Channels);
             if (is_array($values)) {
                 $values = array_map(ucfirst(...), $values);
                 return htmlspecialchars(implode(",", $values));
