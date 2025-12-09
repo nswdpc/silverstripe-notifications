@@ -30,7 +30,7 @@ class NotifyService
             return null;
         }
 
-        if($member->hasExtension(MemberExtension::class)) {
+        if ($member->hasExtension(MemberExtension::class)) {
             return $member->getNotifications();
         } else {
             return null;

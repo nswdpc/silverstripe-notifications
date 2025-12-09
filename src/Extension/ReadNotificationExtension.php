@@ -3,7 +3,6 @@
 namespace Symbiote\Notifications\Extension;
 
 use SilverStripe\Core\Extension;
-use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use Symbiote\Notifications\Model\InternalNotification;
 

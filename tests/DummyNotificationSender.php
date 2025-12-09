@@ -3,11 +3,8 @@
 namespace Symbiote\Notifications\Tests;
 
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
-use Symbiote\Notifications\Model\NotifiedOn;
 use Symbiote\Notifications\Model\NotificationSender;
 use Symbiote\Notifications\Model\SystemNotification;
-
 
 class DummyNotificationSender implements NotificationSender
 {

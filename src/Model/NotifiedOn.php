@@ -2,8 +2,6 @@
 
 namespace Symbiote\Notifications\Model;
 
-use SilverStripe\ORM\DataList;
-
 /**
  * NotifiedOn
  * @author  marcus@symbiote.com.au, shea@livesource.co.nz

@@ -7,10 +7,8 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Reports\Report;
-use Symbiote\Notifications\Model\BroadcastNotification;
 use Symbiote\Notifications\Model\InternalNotification;
 
 class NotificationReport extends Report

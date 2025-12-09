@@ -20,7 +20,6 @@ use SilverStripe\Security\PermissionProvider;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
-use SilverStripe\View\SSViewer_FromString;
 use SilverStripe\Core\Injector\Injector;
 use Symbiote\Notifications\Service\NotificationService;
 use SilverStripe\Forms\ListboxField;
@@ -93,10 +92,11 @@ class SystemNotification extends DataObject implements PermissionProvider
         'ChannelsSummary' => 'Channels'
     ];
 
-    public function getChannelsSummary(): string {
+    public function getChannelsSummary(): string
+    {
         try {
             $values = json_decode($this->Channels);
-            if(is_array($values)) {
+            if (is_array($values)) {
                 $values = array_map(ucfirst(...), $values);
                 return htmlspecialchars(implode(",", $values));
             } else {
@@ -321,7 +321,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     public function getTemplate(): string
     {
         $template = $this->CustomTemplate ?? '';
-        if($template === '') {
+        if ($template === '') {
             $template = self::config()->get('default_template') ?? '';
         }
 

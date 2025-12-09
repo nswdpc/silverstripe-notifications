@@ -2,15 +2,11 @@
 
 namespace Symbiote\Notifications\Job;
 
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
 use Symbiote\Notifications\Model\SystemNotification;
 use Symbiote\Notifications\Service\NotificationService;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJob;
-use Symbiote\MultiValueField\ORM\FieldType\MultiValueField;
 
 /* All code covered by the BSD license located at http://silverstripe.org/bsd-license/ */
 
@@ -22,7 +18,6 @@ if (class_exists(AbstractQueuedJob::class)) {
      */
     class SendNotificationJob extends AbstractQueuedJob
     {
-
         protected ?int $notificationID = null;
 
         protected ?int $contextID = null;
@@ -46,7 +41,7 @@ if (class_exists(AbstractQueuedJob::class)) {
             if ($notification instanceof \Symbiote\Notifications\Model\SystemNotification) {
                 $this->notificationID = $notification->ID;
                 $this->contextID = $context->ID;
-                if($context instanceof \SilverStripe\ORM\DataObject) {
+                if ($context instanceof \SilverStripe\ORM\DataObject) {
                     $this->contextClass = $context::class;
                 }
 

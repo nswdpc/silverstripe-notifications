@@ -2,7 +2,6 @@
 
 namespace Symbiote\Notifications\Model;
 
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
@@ -103,7 +102,7 @@ class BroadcastNotification extends DataObject implements NotifiedOn
      * @param string $event The Identifier of the notification being sent
      * @return array of Member objects
      */
-    public function getRecipients($event):array
+    public function getRecipients($event): array
     {
         $groupIds = $this->Groups()->column('ID');
         if (count($groupIds) !== 0) {

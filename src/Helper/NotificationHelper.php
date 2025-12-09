@@ -5,7 +5,6 @@ namespace Symbiote\Notifications\Helper;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectInterface;
 
 /**
  * A helper for retrieving keywords etc

@@ -5,11 +5,7 @@ namespace Symbiote\Notifications\Extension;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Extension;
 use SilverStripe\View\ArrayData;
-use SilverStripe\Control\Director;
-use SilverStripe\Security\Permission;
-use Symbiote\MemberProfiles\Pages\MemberProfilePage;
 use Symbiote\Notifications\Model\InternalNotification;
-
 
 /**
  * This extension is not applied by default

@@ -4,7 +4,6 @@ namespace Symbiote\Notifications\Tests;
 
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
-use Symbiote\Notifications\Model\NotifiedOn;
 use Symbiote\Notifications\Model\SystemNotification;
 use Symbiote\Notifications\Service\EmailNotificationSender;
 use Symbiote\Notifications\Service\NotificationService;

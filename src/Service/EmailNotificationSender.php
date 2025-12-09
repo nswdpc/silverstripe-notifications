@@ -3,15 +3,10 @@
 namespace Symbiote\Notifications\Service;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Extensible;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
-use Symbiote\Notifications\Model\NotifiedOn;
 use Symbiote\Notifications\Model\NotificationSender;
 use Symbiote\Notifications\Model\SystemNotification;
 

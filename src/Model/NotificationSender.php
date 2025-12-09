@@ -3,7 +3,6 @@
 namespace Symbiote\Notifications\Model;
 
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
 
 /**
  * NotificationSender
