@@ -223,7 +223,7 @@ class SystemNotification extends DataObject implements PermissionProvider
         $keywords = [];
 
         foreach (self::config()->get('global_keywords') as $k => $v) {
-            $keywords[] = '<strong>'.$k.'</strong> ' . $v;
+            $keywords[] = '<strong>'.htmlspecialchars($k).'</strong> ' . htmlspecialchars($v);
         }
 
         if ($this->NotifyOnClass && class_exists($this->NotifyOnClass)) {
@@ -233,7 +233,7 @@ class SystemNotification extends DataObject implements PermissionProvider
 
                 if (is_array($myKeywords)) {
                     foreach ($myKeywords as $keyword => $desc) {
-                        $keywords[] = '<strong>'.$keyword.'</strong> - '.$desc;
+                        $keywords[] = '<strong>'.htmlspecialchars($keyword).'</strong> - '.htmlspecialchars($desc);
                     }
                 }
             }
