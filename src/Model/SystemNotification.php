@@ -11,14 +11,14 @@ use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\View\SSViewer;
 use SilverStripe\Core\Injector\Injector;
 use Symbiote\Notifications\Service\NotificationService;
@@ -277,10 +277,9 @@ class SystemNotification extends DataObject implements PermissionProvider
         $data = $this->getTemplateData($context, $user, $extraData);
 
         // render
-        /* @phpstan-ignore silverstan.injectable.useCreate */
-        $viewer = \SilverStripe\View\SSViewer_FromString::create($text);
-
-        return $viewer->process($data);
+        $engine = \SilverStripe\TemplateEngine\SSTemplateEngine::create();
+        $layerData = \SilverStripe\View\ViewLayerData::create($data);
+        return $engine->renderString($text, $layerData);
     }
 
     /**
@@ -291,7 +290,7 @@ class SystemNotification extends DataObject implements PermissionProvider
     {
         // useful global data
         $data = [
-            'ThemeDirs' => \SilverStripe\ORM\ArrayList::create(SSViewer::get_themes()),
+            'ThemeDirs' => ArrayList::create(SSViewer::get_themes()),
             'SiteConfig' => SiteConfig::current_site_config(),
         ];
 

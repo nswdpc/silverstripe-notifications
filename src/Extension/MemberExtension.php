@@ -2,9 +2,9 @@
 
 namespace Symbiote\Notifications\Extension;
 
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Core\Extension;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\ArrayData;
 use Symbiote\Notifications\Model\InternalNotification;
 
 /**
