@@ -30,8 +30,6 @@ if (class_exists(AbstractQueuedJob::class)) {
 
         /**
          * SendNotificationJob constructor.
-         * @param \Symbiote\Notifications\Model\SystemNotification|null $notification
-         * @param \SilverStripe\ORM\DataObject|null                     $context
          */
         public function __construct(
             ?SystemNotification $notification = null,
