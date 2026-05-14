@@ -20,7 +20,6 @@ use SilverStripe\Security\PermissionProvider;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
-use SilverStripe\View\SSViewer_FromString;
 use SilverStripe\Core\Injector\Injector;
 use Symbiote\Notifications\Service\NotificationService;
 use SilverStripe\Forms\ListboxField;
@@ -29,13 +28,14 @@ use SilverStripe\Forms\ListboxField;
  * SystemNotification
  * @author  marcus@symbiote.com.au, shea@livesource.co.nz
  * @license http://silverstripe.org/bsd-license/
- * @property string Identifier
- * @property string Title
- * @property string Description
- * @property string NotificationText
- * @property string NotificationHTML
- * @property string NotifyOnClass
- * @property string CustomTemplate
+ * @property ?string $Identifier
+ * @property string $Title
+ * @property ?string $Description
+ * @property ?string $NotificationText
+ * @property ?string $NotificationHTML
+ * @property ?string $NotifyOnClass
+ * @property ?string $CustomTemplate
+ * @property ?string $Channels
  */
 class SystemNotification extends DataObject implements PermissionProvider
 {
@@ -71,7 +71,6 @@ class SystemNotification extends DataObject implements PermissionProvider
     /**
      * Name of a template file to render all notifications with
      * Note: it's up to the NotificationSender to decide whether or not to use it
-     * @var string
      */
     private static string $default_template = '';
 
@@ -93,16 +92,17 @@ class SystemNotification extends DataObject implements PermissionProvider
         'ChannelsSummary' => 'Channels'
     ];
 
-    public function getChannelsSummary() {
+    public function getChannelsSummary(): string
+    {
         try {
-            $values = json_decode($this->Channels);
-            if(is_array($values)) {
-                $values = array_map('ucfirst', $values);
+            $values = json_decode((string) $this->Channels);
+            if (is_array($values)) {
+                $values = array_map(ucfirst(...), $values);
                 return htmlspecialchars(implode(",", $values));
             } else {
                 return '';
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return '';
         }
     }
@@ -110,11 +110,12 @@ class SystemNotification extends DataObject implements PermissionProvider
     /**
      * @return FieldList
      */
+    #[\Override]
     public function getCMSFields()
     {
         // Get NotifiedOn implementors
         $types = ClassInfo::implementorsOf(NotifiedOn::class);
-        $configTypes = self::config()->notify_on;
+        $configTypes = self::config()->get('notify_on');
 
         $types = array_merge($types, $configTypes);
 
@@ -139,7 +140,7 @@ class SystemNotification extends DataObject implements PermissionProvider
         }
 
         // Identifiers
-        $identifiers = $this->config()->get('identifiers');
+        $identifiers = self::config()->get('identifiers');
         if (count($identifiers) !== 0) {
             $identifiers = array_combine($identifiers, $identifiers);
         }
@@ -176,7 +177,7 @@ class SystemNotification extends DataObject implements PermissionProvider
                         )
                     )->setAttribute(
                         'placeholder',
-                        $this->config()->get('default_template')
+                        self::config()->get('default_template')
                     ),
                     LiteralField::create('AvailableKeywords', $availableKeywords)
                 )
@@ -185,13 +186,13 @@ class SystemNotification extends DataObject implements PermissionProvider
 
         $channels = Injector::inst()->get(NotificationService::class)->getChannels();
         if ($channels && count($channels)) {
-            $sendChannels = array_combine($channels, array_map('ucfirst', $channels));
+            $sendChannels = array_combine($channels, array_map(ucfirst(...), $channels));
             $list = ListboxField::create('Channels', 'Send via channels', $sendChannels);
             $fields->insertBefore('AvailableKeywords', $list);
             $list->setRightTitle('Leave empty to send to all channels');
         }
 
-        if ($this->config()->html_notifications) {
+        if (self::config()->get('html_notifications')) {
             $fields->insertBefore(
                 'AvailableKeywords',
                 HTMLEditorField::create(
@@ -221,8 +222,8 @@ class SystemNotification extends DataObject implements PermissionProvider
     {
         $keywords = [];
 
-        foreach ($this->config()->get('global_keywords') as $k => $v) {
-            $keywords[] = '<strong>'.$k.'</strong> ' . $v;
+        foreach (self::config()->get('global_keywords') as $k => $v) {
+            $keywords[] = '<strong>'.htmlspecialchars((string) $k).'</strong> ' . htmlspecialchars((string) $v);
         }
 
         if ($this->NotifyOnClass && class_exists($this->NotifyOnClass)) {
@@ -232,7 +233,7 @@ class SystemNotification extends DataObject implements PermissionProvider
 
                 if (is_array($myKeywords)) {
                     foreach ($myKeywords as $keyword => $desc) {
-                        $keywords[] = '<strong>'.$keyword.'</strong> - '.$desc;
+                        $keywords[] = '<strong>'.htmlspecialchars((string) $keyword).'</strong> - '.htmlspecialchars((string) $desc);
                     }
                 }
             }
@@ -243,10 +244,10 @@ class SystemNotification extends DataObject implements PermissionProvider
 
     /**
      * Get a list of recipients from the notification with the given context
-     * @param  DataObject $context
+     * @param ?DataObject $context
      *                The context object this notification is attached to.
      */
-    public function getRecipients(DataObject $context = null): ArrayList
+    public function getRecipients(?DataObject $context = null): ArrayList
     {
         $recipients = ArrayList::create();
 
@@ -276,10 +277,10 @@ class SystemNotification extends DataObject implements PermissionProvider
         $data = $this->getTemplateData($context, $user, $extraData);
 
         // render
-        $viewer = new SSViewer_FromString($text);
-        $string = $viewer->process($data);
+        /* @phpstan-ignore silverstan.injectable.useCreate */
+        $viewer = \SilverStripe\View\SSViewer_FromString::create($text);
 
-        return $string;
+        return $viewer->process($data);
     }
 
     /**
@@ -320,9 +321,10 @@ class SystemNotification extends DataObject implements PermissionProvider
     public function getTemplate(): string
     {
         $template = $this->CustomTemplate ?? '';
-        if($template === '') {
-            $template = $this->config()->get('default_template') ?? '';
+        if ($template === '') {
+            $template = self::config()->get('default_template') ?? '';
         }
+
         return $template;
     }
 
@@ -331,24 +333,28 @@ class SystemNotification extends DataObject implements PermissionProvider
      */
     public function NotificationContent(): string
     {
-        return $this->config()->html_notifications ? $this->NotificationHTML : $this->NotificationText;
+        return self::config()->get('html_notifications') ? $this->NotificationHTML : $this->NotificationText;
     }
 
+    #[\Override]
     public function canView($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_VIEW');
     }
 
+    #[\Override]
     public function canEdit($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_EDIT');
     }
 
+    #[\Override]
     public function canDelete($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_DELETE');
     }
 
+    #[\Override]
     public function canCreate($member = null, $context = [])
     {
         return Permission::check('ADMIN') || Permission::check('SYSTEMNOTIFICATION_CREATE');

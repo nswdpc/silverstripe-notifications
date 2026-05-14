@@ -7,10 +7,8 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Reports\Report;
-use Symbiote\Notifications\Model\BroadcastNotification;
 use Symbiote\Notifications\Model\InternalNotification;
 
 class NotificationReport extends Report
@@ -19,6 +17,7 @@ class NotificationReport extends Report
         InternalNotification::class => 'Internal message',
     ];
 
+    #[\Override]
     public function title()
     {
         return _t(self::class . '.NOTIFICATION_REPORT', 'Notifications');
@@ -29,7 +28,7 @@ class NotificationReport extends Report
         return _t(self::class . '.NOTIFICATION_REPORT_TITLE', "Notification reports");
     }
 
-    public function sourceRecords($params, $sort, $limit)
+    public function sourceRecords(array $params, $sort, $limit)
     {
         $type = $this->getReportType($params);
 
@@ -43,6 +42,7 @@ class NotificationReport extends Report
         ]);
     }
 
+    #[\Override]
     public function columns()
     {
         $ctrl = Controller::curr();
@@ -52,10 +52,11 @@ class NotificationReport extends Report
         return $type::config()->summary_fields;
     }
 
-    protected function getReportType($params)
+    protected function getReportType(array $params)
     {
         $type = $params['Type'] ?? InternalNotification::class;
-        if (!isset(self::config()->notification_types[$type])) {
+        $types = self::config()->get('notification_types');
+        if (!isset($types[$type])) {
             throw new Exception("Invalid type");
         }
 
@@ -67,8 +68,9 @@ class NotificationReport extends Report
         $ctrl = Controller::curr();
         $params = $ctrl ? $ctrl->getRequest()->getVar('filter') : [];
 
+        $types = self::config()->get('notification_types') ?? [];
         $fields = FieldList::create(
-            DropdownField::create('Type', 'Notification type', self::config()->notification_types),
+            DropdownField::create('Type', 'Notification type', $types),
             $from = DateField::create('From'),
             $to = DateField::create('To')
         );

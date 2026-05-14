@@ -2,7 +2,6 @@
 
 namespace Symbiote\Notifications\Model;
 
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
@@ -13,6 +12,14 @@ use SilverStripe\Security\Permission;
 use Symbiote\MultiValueField\Fields\KeyValueField;
 use Symbiote\Notifications\Controller\NotificationAdmin;
 
+/**
+ * @property string $Title
+ * @property ?string $Content
+ * @property bool $SendNow
+ * @property bool $IsPublic
+ * @property mixed $Context
+ * @method \SilverStripe\ORM\ManyManyList<\SilverStripe\Security\Group> Groups()
+ */
 class BroadcastNotification extends DataObject implements NotifiedOn
 {
     private static string $table_name = 'BroadcastNotification';
@@ -29,6 +36,7 @@ class BroadcastNotification extends DataObject implements NotifiedOn
         'Groups' => Group::class
     ];
 
+    #[\Override]
     public function onBeforeWrite()
     {
         if ($this->SendNow) {
@@ -42,6 +50,7 @@ class BroadcastNotification extends DataObject implements NotifiedOn
         parent::onBeforeWrite();
     }
 
+    #[\Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -93,14 +102,14 @@ class BroadcastNotification extends DataObject implements NotifiedOn
      * @param string $event The Identifier of the notification being sent
      * @return array of Member objects
      */
-    public function getRecipients($event):array
+    public function getRecipients($event): array
     {
         $groupIds = $this->Groups()->column('ID');
         if (count($groupIds) !== 0) {
             return Member::get()->filter('Groups.ID', $groupIds)->toArray();
         }
 
-        return null;
+        return [];
     }
 
     public function Link(): ?string
@@ -109,21 +118,25 @@ class BroadcastNotification extends DataObject implements NotifiedOn
         return $context['Link'] ?? null;
     }
 
+    #[\Override]
     public function canCreate($member = null, $context = [])
     {
         return Permission::check('CMS_ACCESS_' . NotificationAdmin::class) || parent::canCreate($member, $context);
     }
 
+    #[\Override]
     public function canDelete($member = null)
     {
         return Permission::check('CMS_ACCESS_' . NotificationAdmin::class) || parent::canDelete($member);
     }
 
+    #[\Override]
     public function canView($member = null)
     {
         return $this->IsPublic || (Permission::check('CMS_ACCESS_' . NotificationAdmin::class) || parent::canView($member));
     }
 
+    #[\Override]
     public function canEdit($member = null)
     {
         return Permission::check('CMS_ACCESS_' . NotificationAdmin::class) || parent::canEdit($member);

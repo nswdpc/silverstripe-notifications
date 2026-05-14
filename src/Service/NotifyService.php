@@ -2,9 +2,10 @@
 
 namespace Symbiote\Notifications\Service;
 
-use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
+use Symbiote\Notifications\Extension\MemberExtension;
 use Symbiote\Notifications\Model\InternalNotification;
 
 class NotifyService
@@ -22,14 +23,18 @@ class NotifyService
      * List all the notifications a user has, on a particular item,
      * and/or of a particular type
      */
-    public function list(): ?DataList
+    public function list(): ?ArrayList
     {
         $member = Security::getCurrentUser();
         if (!$member) {
             return null;
         }
 
-        return $member->getNotifications();
+        if ($member->hasExtension(MemberExtension::class)) {
+            return $member->getNotifications();
+        } else {
+            return null;
+        }
     }
 
     /**

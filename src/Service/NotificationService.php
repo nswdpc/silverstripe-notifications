@@ -56,7 +56,7 @@ class NotificationService
     public function __construct()
     {
         if (!class_exists(QueuedJobService::class)) {
-            $this->config()->use_queues = false;
+            $this->config()->set('use_queues', false);
         }
 
         $this->setSenders($this->config()->get('default_senders'));
@@ -67,7 +67,7 @@ class NotificationService
      * Add a channel that this notification service should use when sending notifications
      * @param string $channel The channel to add
      */
-    public function addChannel($channel): self
+    public function addChannel(string $channel): self
     {
         $this->channels[] = $channel;
 
@@ -83,7 +83,7 @@ class NotificationService
      * Set the list of channels this notification service should use when sending notifications
      * @param array $channels The channels to send to
      */
-    public function setChannels($channels): static
+    public function setChannels(array $channels): static
     {
         $this->channels = $channels;
 
@@ -131,6 +131,7 @@ class NotificationService
      * @param string      $identifier The Identifier of the notification event
      * @param DataObject  $context    The context (if relevant) of the object to notify on
      * @param array       $data       Extra data to be sent along with the notification
+     * @param string $channel a channel to use for this notification, overrides SystemNotification.Channels value
      */
     public function notify(string $identifier, DataObject $context, array $data = [], ?string $channel = null)
     {
@@ -146,8 +147,12 @@ class NotificationService
 
                 // figure out the channels to send the notification on
                 $channels = $channel ? [$channel] : [];
-                if ($notification->Channels) {
-                    $channels = json_decode($notification->Channels);
+                if ($channels === [] && is_string($notification->Channels)) {
+                    try {
+                        $channels = json_decode($notification->Channels, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException) {
+                        // noop
+                    }
                 }
 
                 $this->sendNotification($notification, $context, $data, $channels);
@@ -186,11 +191,7 @@ class NotificationService
                 )
             );
         } else {
-            if (!is_array($channels)) {
-                $channels = [$channels];
-            }
-
-            $channels = count($channels) ? $channels : $this->channels;
+            $channels = $channels !== [] ? $channels : $this->getChannels();
             foreach ($channels as $channel) {
                 if ($sender = $this->getSender($channel)) {
                     $sender->sendNotification($notification, $context, $extraData);
@@ -201,7 +202,6 @@ class NotificationService
 
     /**
      * Sends a notification directly to a user
-     * @param object $user
      */
     public function sendToUser(
         SystemNotification $notification,

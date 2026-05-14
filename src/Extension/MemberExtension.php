@@ -5,25 +5,31 @@ namespace Symbiote\Notifications\Extension;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Extension;
 use SilverStripe\View\ArrayData;
-use SilverStripe\Control\Director;
-use SilverStripe\Security\Permission;
-use Symbiote\MemberProfiles\Pages\MemberProfilePage;
 use Symbiote\Notifications\Model\InternalNotification;
 
+/**
+ * This extension is not applied by default
+ * @extends \SilverStripe\Core\Extension<static>
+ */
 class MemberExtension extends Extension
 {
     public function getNotifications(int $limit = 10, int $offset = 0, array $filter = []): ArrayList
     {
+
+        /** @var \SilverStripe\Security\Member $owner */
+        $owner = $this->getOwner();
         $filter = array_merge(
             $filter,
-            ['ToID' => $this->getOwner()->ID]
+            ['ToID' => $owner->ID]
         );
 
         $notifications = ArrayList::create();
 
         foreach (InternalNotification::get()->filter($filter)->limit($limit, $offset) as $intNote) {
             $notification = ArrayData::create($intNote->toMap());
-            $notification->setField('FromUsername', $intNote->From()->getNotificationUsername());
+            $from = $intNote->From();
+            /** @phpstan-ignore method.notFound */
+            $notification->setField('FromUsername', ($from ? $from->getNotificationUsername() : null));
             $notifications->push($notification);
         }
 
@@ -32,10 +38,13 @@ class MemberExtension extends Extension
 
     public function getNotificationUsername(): string
     {
-        if ($this->getOwner()->Username) {
-            return $this->getOwner()->Username;
+
+        /** @var \SilverStripe\Security\Member $owner */
+        $owner = $this->getOwner();
+        if ($owner->Username) {
+            return $owner->Username;
         }
 
-        return $this->getOwner()->getTitle();
+        return $owner->getTitle();
     }
 }

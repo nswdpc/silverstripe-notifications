@@ -2,41 +2,44 @@
 
 namespace Symbiote\Notifications\Job;
 
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
 use Symbiote\Notifications\Model\SystemNotification;
 use Symbiote\Notifications\Service\NotificationService;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJob;
-use Symbiote\MultiValueField\ORM\FieldType\MultiValueField;
 
 /* All code covered by the BSD license located at http://silverstripe.org/bsd-license/ */
 
-if (class_exists('Symbiote\QueuedJobs\Services\AbstractQueuedJob')) {
+if (class_exists(AbstractQueuedJob::class)) {
 
     /**
      * A queued job for sending notifications
      * @author Marcus Nyeholt <marcus@symbiote.com.au>
      */
-    class SendNotificationJob extends AbstractQueuedJob implements QueuedJob
+    class SendNotificationJob extends AbstractQueuedJob
     {
+        protected ?int $notificationID = null;
+
+        protected ?int $contextID = null;
+
+        protected ?string $contextClass = null;
+
+        protected array $extraData = [];
+
+        protected array $sendTo = [];
+
         /**
          * SendNotificationJob constructor.
-         * @param \Symbiote\Notifications\Model\SystemNotification|null $notification
-         * @param \SilverStripe\ORM\DataObject|null                     $context
-         * @param array                                                 $data
          */
         public function __construct(
-            SystemNotification $notification = null,
-            DataObject $context = null,
-            $data = []
+            ?SystemNotification $notification = null,
+            ?DataObject $context = null,
+            array $data = []
         ) {
             if ($notification instanceof \Symbiote\Notifications\Model\SystemNotification) {
                 $this->notificationID = $notification->ID;
                 $this->contextID = $context->ID;
-                if($context instanceof \SilverStripe\ORM\DataObject) {
+                if ($context instanceof \SilverStripe\ORM\DataObject) {
                     $this->contextClass = $context::class;
                 }
 
@@ -44,10 +47,7 @@ if (class_exists('Symbiote\QueuedJobs\Services\AbstractQueuedJob')) {
             }
         }
 
-        /**
-         * @return \SilverStripe\ORM\DataObject
-         */
-        public function getNotification(): ?DataObject
+        public function getNotification(): ?SystemNotification
         {
             return SystemNotification::get()->byID($this->notificationID);
         }
@@ -89,24 +89,16 @@ if (class_exists('Symbiote\QueuedJobs\Services\AbstractQueuedJob')) {
             $notification = $this->getNotification();
             $recipients = $notification->getRecipients($this->getContext());
             $sendTo = [];
-            if ($recipients) {
-                if (is_array($recipients) || $recipients instanceof DataList || $recipients instanceof ArrayList) {
-                    foreach ($recipients as $r) {
-                        $sendTo[$r->ID] = $r->ClassName;
-                    }
-                } elseif ($recipients instanceof MultiValueField) {
-                    $recipients = $recipients->getValues();
-                    foreach ($recipients as $id) {
-                        $sendTo[$id] = Member::class;
-                    }
-                }
 
-                $this->totalSteps = count($recipients);
-                $this->sendTo = $sendTo;
+            foreach ($recipients as $r) {
+                $sendTo[$r->ID] = $r->ClassName;
             }
 
+            $this->sendTo = $sendTo;
+            /* @phpstan-ignore property.notFound */
             $this->totalSteps = count($this->sendTo);
 
+            /* @phpstan-ignore class.notFound, class.notFound */
             return $this->totalSteps > 5 ? QueuedJob::QUEUED : QueuedJob::IMMEDIATE;
         }
 
@@ -115,11 +107,13 @@ if (class_exists('Symbiote\QueuedJobs\Services\AbstractQueuedJob')) {
             $remaining = $this->sendTo;
 
             // if there's no more, we're done!
-            if (count($remaining) === 0) {
+            if ($remaining === []) {
+                /* @phpstan-ignore property.notFound */
                 $this->isComplete = true;
                 return;
             }
 
+            /* @phpstan-ignore property.notFound, property.notFound */
             $this->currentStep++;
 
             $keys = array_keys($remaining);
@@ -148,6 +142,7 @@ if (class_exists('Symbiote\QueuedJobs\Services\AbstractQueuedJob')) {
             $this->sendTo = $remaining;
 
             if (count($remaining) <= 0) {
+                /* @phpstan-ignore property.notFound */
                 $this->isComplete = true;
             }
         }

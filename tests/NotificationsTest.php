@@ -4,7 +4,6 @@ namespace Symbiote\Notifications\Tests;
 
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Dev\SapphireTest;
-use Symbiote\Notifications\Model\NotifiedOn;
 use Symbiote\Notifications\Model\SystemNotification;
 use Symbiote\Notifications\Service\EmailNotificationSender;
 use Symbiote\Notifications\Service\NotificationService;
@@ -39,7 +38,7 @@ class NotificationsTest extends SapphireTest
         $ns = new NotificationService();
         $ds = new DummyNotificationSender();
 
-        Config::inst()->update(NotificationService::class, 'use_queues', false);
+        Config::modify()->set(NotificationService::class, 'use_queues', false);
 
         $ns->addSender('dummy', $ds);
         $ns->setChannels(['dummy']);
@@ -72,7 +71,7 @@ class NotificationsTest extends SapphireTest
         $ns = new NotificationService();
         $ds = new DummyNotificationSender();
 
-        Config::inst()->update(NotificationService::class, 'use_queues', false);
+        Config::modify()->set(NotificationService::class, 'use_queues', false);
 
         $ns->addSender('dummy', $ds);
         $ns->notify('NOTIFY_ON_EVENT', $page, [], 'dummy');
@@ -103,13 +102,13 @@ class NotificationsTest extends SapphireTest
 
         $ns = new NotificationService();
 
-        Config::inst()->update(NotificationService::class, 'use_queues', false);
-        Config::inst()->update(
+        Config::modify()->set(NotificationService::class, 'use_queues', false);
+        Config::modify()->set(
             EmailNotificationSender::class,
             'send_notifications_from',
             'test@test.com'
         );
-        Config::inst()->update(SystemNotification::class, 'default_template', false);
+        Config::modify()->set(SystemNotification::class, 'default_template', false);
 
         $ns->setSenders(['email' => EmailNotificationSender::class]);
         $ns->setChannels(['email']);
@@ -120,8 +119,6 @@ class NotificationsTest extends SapphireTest
         $expectedTo = $users[0]->Email;
         $expectedFrom = 'test@test.com';
         $expectedSubject = $notification->Title;
-        $expectedBody = "This is a notfication to {$expectedTo} about $page->Title";
-        $notification->format($expectedBody, $page); // TODO
 
         $this->assertEmailSent($expectedTo, $expectedFrom, $expectedSubject);
     }

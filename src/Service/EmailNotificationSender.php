@@ -3,15 +3,10 @@
 namespace Symbiote\Notifications\Service;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Extensible;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Security\Member;
-use Symbiote\Notifications\Model\NotifiedOn;
 use Symbiote\Notifications\Model\NotificationSender;
 use Symbiote\Notifications\Model\SystemNotification;
 
@@ -58,21 +53,12 @@ class EmailNotificationSender implements NotificationSender
     {
         $subject = $notification->format($notification->Title, $context, $user, $data);
 
-        if (Config::inst()->get(SystemNotification::class, 'html_notifications')) {
-            $message = $notification->format(
-                $notification->NotificationContent(),
-                $context,
-                $user,
-                $data
-            );
-        } else {
-            $message = $notification->format(
-                $notification->NotificationContent(),
-                $context,
-                $user,
-                $data
-            );
-        }
+        $message = $notification->format(
+            $notification->NotificationContent(),
+            $context,
+            $user,
+            $data
+        );
 
         if (($template = $notification->getTemplate()) !== '') {
             $templateData = $notification->getTemplateData($context, $user, $data);

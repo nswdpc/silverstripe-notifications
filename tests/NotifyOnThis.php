@@ -5,8 +5,6 @@ namespace Symbiote\Notifications\Tests;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\Security\Member;
 use Symbiote\Notifications\Model\NotifiedOn;
 
 /**
@@ -16,6 +14,8 @@ use Symbiote\Notifications\Model\NotifiedOn;
 class NotifyOnThis extends DataObject implements NotifiedOn, TestOnly
 {
     use Configurable;
+
+    private static string $table_name = "NotificationsTestNotifyOnThis";
 
     private static array $db = [
         'Title' => 'Varchar',

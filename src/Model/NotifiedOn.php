@@ -1,8 +1,8 @@
 <?php
 
-namespace Symbiote\Notifications\Model;
+declare(strict_types=1);
 
-use SilverStripe\ORM\DataList;
+namespace Symbiote\Notifications\Model;
 
 /**
  * NotifiedOn
