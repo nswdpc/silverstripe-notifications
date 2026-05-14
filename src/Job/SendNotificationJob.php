@@ -34,8 +34,8 @@ if (class_exists(AbstractQueuedJob::class)) {
          * @param \SilverStripe\ORM\DataObject|null                     $context
          */
         public function __construct(
-            SystemNotification $notification = null,
-            DataObject $context = null,
+            ?SystemNotification $notification = null,
+            ?DataObject $context = null,
             array $data = []
         ) {
             if ($notification instanceof \Symbiote\Notifications\Model\SystemNotification) {

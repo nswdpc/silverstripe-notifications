@@ -244,10 +244,10 @@ class SystemNotification extends DataObject implements PermissionProvider
 
     /**
      * Get a list of recipients from the notification with the given context
-     * @param  DataObject $context
+     * @param ?DataObject $context
      *                The context object this notification is attached to.
      */
-    public function getRecipients(DataObject $context = null): ArrayList
+    public function getRecipients(?DataObject $context = null): ArrayList
     {
         $recipients = ArrayList::create();
 
