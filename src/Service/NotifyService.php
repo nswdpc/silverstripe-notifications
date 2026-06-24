@@ -2,7 +2,7 @@
 
 namespace Symbiote\Notifications\Service;
 
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use Symbiote\Notifications\Extension\MemberExtension;

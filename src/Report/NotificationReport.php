@@ -28,7 +28,7 @@ class NotificationReport extends Report
         return _t(self::class . '.NOTIFICATION_REPORT_TITLE', "Notification reports");
     }
 
-    public function sourceRecords(array $params, $sort, $limit)
+    public function sourceRecords(array $params, $sort, $limit): \SilverStripe\ORM\DataList
     {
         $type = $this->getReportType($params);
 
